@@ -1,0 +1,25 @@
+{
+  "name": "genitor-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "Chatbot Genitor para WhatsApp usando whatsapp-web.js",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "chatbot",
+    "genitor"
+  ],
+  "author": "Bruno Souza",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
