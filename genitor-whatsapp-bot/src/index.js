@@ -2,6 +2,18 @@ require('dotenv').config();
 
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const express = require('express');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+    res.send('Genitor WhatsApp Bot online');
+});
+
+app.listen(PORT, () => {
+    console.log(`Servidor HTTP rodando na porta ${PORT}`);
+});
 
 const PHONE_NUMBER_PATTERN = /^\d{10,15}$/;
 
