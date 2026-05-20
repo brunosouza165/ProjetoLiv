@@ -11,6 +11,10 @@ app.get('/', (req, res) => {
     res.send('Genitor WhatsApp Bot online');
 });
 
+app.get('/health', (req, res) => {
+    res.send('ok');
+});
+
 app.listen(PORT, () => {
     console.log(`Servidor HTTP rodando na porta ${PORT}`);
 });
