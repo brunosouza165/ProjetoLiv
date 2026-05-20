@@ -155,8 +155,8 @@ function validateConfig() {
         process.exit(1);
     }
 
-    if (ALLOWED_CONTACT && !isValidPhoneNumber(ALLOWED_CONTACT)) {
-        console.error('Erro: configure ALLOWED_CONTACT no .env usando apenas numeros, ou deixe vazio.');
+    if (!isValidPhoneNumber(ALLOWED_CONTACT)) {
+        console.error('Erro: configure ALLOWED_CONTACT no .env usando apenas numeros. Exemplo: 5511888888888');
         process.exit(1);
     }
 }
@@ -245,30 +245,11 @@ async function processMessage(message, eventName) {
         );
     }
 
-    // Se ALLOWED_CONTACT está configurado, ignora mensagens de outros contatos
-    const isAllowedSender = senderIdentifiers.includes(ALLOWED_CONTACT) || senderIdentifiers.includes(AUTHORIZED_NUMBER);
-
-    if (ALLOWED_CONTACT && !isAllowedSender) {
-        console.log(
-            `Mensagem ignorada: contato nao permitido. ` +
-            `Recebido=${senderIdentifiers.map((identifier) => maskPhoneNumber(identifier)).join(', ') || 'sem identificador'}. ` +
-            `Esperado ALLOWED_CONTACT=${maskPhoneNumber(ALLOWED_CONTACT)} ou AUTHORIZED_NUMBER=${maskPhoneNumber(AUTHORIZED_NUMBER)}.`
-        );
-        return;
-    }
-
-    console.log(`Mensagem recebida de ${maskPhoneNumber(sender)}: ${text || '[sem texto]'}`);
-
-    if (text === 'ping') {
-        await message.reply(RESPONSE_PONG);
-        return;
-    }
+    const isAllowedContact = senderIdentifiers.includes(ALLOWED_CONTACT);
+    const isAuthorizedNumber = senderIdentifiers.includes(AUTHORIZED_NUMBER);
 
     // Se a usuária autorizada responder OK, o bot responde para quem perguntou.
-    if (
-        senderIdentifiers.includes(AUTHORIZED_NUMBER) &&
-        text === 'ok'
-    ) {
+    if (isAuthorizedNumber && text === 'ok') {
         const contatoPendente = perguntasPendentesBernardo.shift();
 
         if (!contatoPendente) {
@@ -279,6 +260,23 @@ async function processMessage(message, eventName) {
         await client.sendMessage(contatoPendente, RESPONSE_BERNARDO_OK);
 
         await message.reply(RESPONSE_SENT);
+        return;
+    }
+
+    // Somente o ALLOWED_CONTACT pode iniciar conversa com o bot.
+    if (!isAllowedContact) {
+        console.log(
+            `Mensagem ignorada: apenas ALLOWED_CONTACT pode chamar o bot. ` +
+            `Recebido=${senderIdentifiers.map((identifier) => maskPhoneNumber(identifier)).join(', ') || 'sem identificador'}. ` +
+            `Esperado ALLOWED_CONTACT=${maskPhoneNumber(ALLOWED_CONTACT)}.`
+        );
+        return;
+    }
+
+    console.log(`Mensagem recebida de ${maskPhoneNumber(sender)}: ${text || '[sem texto]'}`);
+
+    if (text === 'ping') {
+        await message.reply(RESPONSE_PONG);
         return;
     }
 
